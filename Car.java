@@ -1,4 +1,3 @@
-import java.util.Arrays;
 import java.util.Random;
 
 public class Car {
@@ -8,7 +7,7 @@ public class Car {
     }
     private String make, model, color;
     private double price, mileage;
-    private char[] vin;
+    private StringBuilder vin;
 
     public void make(String make) {
         this.make = make;
@@ -51,20 +50,20 @@ public class Car {
     }
 
     public void newVin() {
-        char[] alphabet = "0123456789abcdefghjklmnprstuvwxyz".toCharArray();
-        char[] vin = new char[17];
+        String alphabet = "0123456789abcdefghjklmnprstuvwxyz";
+        StringBuilder vin = new StringBuilder(17);
 
         Random randNum = new Random();
-        for (int i = 0; i < vin.length; i++) {
-            vin[i] = alphabet[randNum.nextInt(vin.length)];
+        for (int i = 0; i < vin.capacity(); i++) {
+            vin.append(alphabet.charAt(randNum.nextInt(vin.capacity()))) ;
         }
-        System.out.println("VIN = " + Arrays.toString(vin));
+       // System.out.println("\nVIN = " + Arrays.toString(vin));
 
        this.vin = vin;
 
     }
 
-    public char[] getVin() {
+    public StringBuilder getVin() {
         return this.vin;
     }
 
