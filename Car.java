@@ -1,14 +1,23 @@
 import java.util.Random;
 
 public class Car {
-
-    public Car() {
-
-    }
+    /**
+     * ------- Global Declarations
+     */
     private String make, model, color;
     private double price, mileage;
     private StringBuilder vin;
+    /**
+     * ------- Constructors
+     */
+    public Car() {
 
+    }
+    
+    /**
+     * ------- Getter/Setter Functions
+     *  
+     */
     public void make(String make) {
         this.make = make;
     }
