@@ -1,42 +1,22 @@
-/**
- * ****************************************************************************
- * Compilation: javac IndexMinPQ.java Execution: java IndexMinPQ Dependencies:
- * StdOut.java
- *
- * Minimum-oriented indexed PQ implementation using a binary heap.
- *
- *****************************************************************************
- */
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * The <tt>IndexMinPQ</tt> class represents an indexed priority queue of generic
- * keys. It supports the usual <em>insert</em> and <em>delete-the-minimum</em>
- * operations, along with <em>delete</em> and <em>change-the-key</em>
- * methods. In order to let the client refer to keys on the priority queue, an
- * integer between 0 and maxN-1 is associated with each key&mdash;the client
- * uses this integer to specify which key to delete or change. It also supports
- * methods for peeking at the minimum key, testing if the priority queue is
- * empty, and iterating through the keys.
+ * The <tt>IndexMinPQ</tt> class represents an indexed priority queue of cars.
+ * It supports  <em>insert</em>,  <em>delMin</em> and <em>delete</em>. In order to
+ * let the client refer to cars on the priority queue, an integer between 0 and
+ * maxN-1 is associated with each car;the client uses this integer to
+ * specify which car to delete. It also supports methods for peeking at the
+ * minimum car by price or by mileage, testing if the priority queue is empty, and iterating through
+ * the cars.
  * <p>
- * This implementation uses a binary heap along with an array to associate keys
- * with integers in the given range. The <em>insert</em>,
- * <em>delete-the-minimum</em>, <em>delete</em>,
- * <em>change-key</em>, <em>decrease-key</em>, and <em>increase-key</em>
- * operations take logarithmic time. The <em>is-empty</em>, <em>size</em>,
+ * This implementation uses a binary heap along with an array to associate cars
+ * with integers in the given range. The <em>insert</em>, <em>delMin</em> and
+ * <em>delete</em> operations take logarithmic time. The <em>is-empty</em>, <em>size</em>,
  * <em>min-index</em>, <em>min-key</em>, and <em>key-of</em>
  * operations take constant time. Construction takes time proportional to the
  * specified capacity.
- * <p>
- * For additional documentation, see
- * <a href="http://algs4.cs.princeton.edu/24pq">Section 2.4</a> of
- * <i>Algorithms, 4th Edition</i> by Robert Sedgewick and Kevin Wayne.
- *
- * @author Robert Sedgewick
- * @author Kevin Wayne
- *
- * @param <Key> the generic type of key on this priority queue
  */
 public class IndexMinPQ implements Iterable<Integer> {
 
@@ -45,20 +25,17 @@ public class IndexMinPQ implements Iterable<Integer> {
     private int[] pq;        // binary heap using 1-based indexing
     private int[] qp;        // inverse of pqPr - qpPr[pqPr[i]] = pqPr[qpPr[i]] = i
     private Car[] cars;      // carsByPrice[i] = priority of i
-    private boolean price;          // boolean to know what the priority is
+    private String priority;          // boolean to know what the priority is
 
     /**
      * Initializes an empty indexed priority queue with indices between
-     * <tt>0</tt>
-     * and <tt>maxN - 1</tt>.
+     * <tt>0</tt> and <tt>maxN - 1</tt>.
      *
-     * @param maxN the keys on this priority queue are index from <tt>0</tt>
+     * @param maxN the cars on this priority queue are index from <tt>0</tt>
      * <tt>maxN - 1</tt>
      * @param priority
      * @throws IllegalArgumentException if <tt>maxN</tt> &lt; <tt>0</tt>
      */
-    
-
     public IndexMinPQ(int maxN, String priority) {
         if (maxN < 0) {
             throw new IllegalArgumentException();
@@ -70,19 +47,15 @@ public class IndexMinPQ implements Iterable<Integer> {
         for (int i = 0; i <= maxN; i++) {
             qp[i] = -1;
         }
-        if (priority.equalsIgnoreCase("price")) {
-            price = true;
-        } else if (priority.equalsIgnoreCase("mileage")) {
-            price = false;
-        } else {
-            StdOut.println("Invalid entry for priority field.\nNo Priority Queue created.");
+        if (!(priority.equalsIgnoreCase("price") || priority.equalsIgnoreCase("mileage"))) {
+            StdOut.println("Invalid entry for priority.\nExiting Program.");
             System.exit(0);
         }
-
+        this.priority = priority;
     }
 
     IndexMinPQ() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported.");
     }
 
     /**
@@ -112,9 +85,9 @@ public class IndexMinPQ implements Iterable<Integer> {
     }
 
     /**
-     * Returns the number of keys on this priority queue.
+     * Returns the number of cars on this priority queue.
      *
-     * @return the number of keys on this priority queue
+     * @return the number of cars on this priority queue
      */
     public int size() {
         return N;
@@ -146,9 +119,9 @@ public class IndexMinPQ implements Iterable<Integer> {
     }
 
     /**
-     * Returns an index associated with a minimum key.
+     * Returns an index associated with a minimum car.
      *
-     * @return an index associated with a minimum key
+     * @return an index associated with a minimum car
      * @throws NoSuchElementException if this priority queue is empty
      */
     public int minIndex() {
@@ -159,9 +132,9 @@ public class IndexMinPQ implements Iterable<Integer> {
     }
 
     /**
-     * Returns a minimum key.
+     * Returns a minimum car.
      *
-     * @return a minimum key
+     * @return a minimum car
      * @throws NoSuchElementException if this priority queue is empty
      */
     public Car minKey() {
@@ -172,34 +145,13 @@ public class IndexMinPQ implements Iterable<Integer> {
     }
 
     /**
-     * Removes a minimum key and returns its associated index.
-     *
-     * @return an index associated with a minimum key
-     * @throws NoSuchElementException if this priority queue is empty
-     */
-    public int delMin() {
-        if (N == 0) {
-            throw new NoSuchElementException("Priority queue underflow");
-        }
-        int min = pq[1];
-        exch(1, N--);
-        sink(1);
-        assert min == pq[N + 1];
-        qp[min] = -1;        // delete
-
-        cars[min] = null;    // to help with garbage collection
-        pq[N + 1] = -1;        // not needed
-        return min;
-    }
-
-    /**
      * Returns the car associated with index <tt>i</tt>.
      *
-     * @param i the index of the key to return
-     * @return the key associated with index <tt>i</tt>
+     * @param i the index of the car to return
+     * @return the car associated with index <tt>i</tt>
      * @throws IndexOutOfBoundsException unless 0 &le; <tt>i</tt> &lt;
      * <tt>maxN</tt>
-     * @throws NoSuchElementException no key is associated with index <tt>i</tt>
+     * @throws NoSuchElementException no car is associated with index <tt>i</tt>
      */
     public Car keyOf(int i) {
         if (i < 0 || i >= maxN) {
@@ -213,104 +165,19 @@ public class IndexMinPQ implements Iterable<Integer> {
     }
 
     /**
-     * Change the key associated with index <tt>i</tt> to the specified value.
+     * Remove the car associated with index <tt>i</tt>.
      *
-     * @param i the index of the car to change
-     * @param car change the car associated with index <tt>i</tt> to this key
+     * @param i the index of the car to remove
      * @throws IndexOutOfBoundsException unless 0 &le; <tt>i</tt> &lt;
      * <tt>maxN</tt>
-     * @throws NoSuchElementException no key is associated with index <tt>i</tt>
-     */
-    public void changeKey(int i, Car car) {
-        if (i < 0 || i >= maxN) {
-            throw new IndexOutOfBoundsException();
-        }
-        if (!contains(i)) {
-            throw new NoSuchElementException("index is not in the priority queue");
-        }
-
-        cars[i] = car;
-        swim(qp[i]);
-        sink(qp[i]);
-    }
-
-    /**
-     * Change the car associated with index <tt>i</tt> to the specified value.
-     *
-     * @param i the index of the car to change
-     * @param car change the car associated with index <tt>i</tt> to this key
-     * @throws IndexOutOfBoundsException unless 0 &le; <tt>i</tt> &lt;
-     * <tt>maxN</tt>
-     * @deprecated Replaced by {@link #changeKey(int, Key)}.
-     */
-    public void change(int i, Car car) {
-        changeKey(i, car);
-    }
-
-    /**
-     * Decrease the car associated with index <tt>i</tt> to the specified value.
-     *
-     * @param i the index of the car to decrease
-     * @param car decrease the car associated with index <tt>i</tt> to this key
-     * @throws IndexOutOfBoundsException unless 0 &le; <tt>i</tt> &lt;
-     * <tt>maxN</tt>
-     * @throws IllegalArgumentException if key &ge; key associated with index
-     * <tt>i</tt>
-     * @throws NoSuchElementException no key is associated with index <tt>i</tt>
-     */
-    public void decreaseKey(int i, Car car) {
-        if (i < 0 || i >= maxN) {
-            throw new IndexOutOfBoundsException();
-        }
-        if (!contains(i)) {
-            throw new NoSuchElementException("index is not in the priority queue");
-        }
-        if ((cars[i]).getPrice() <= (car).getPrice()) {
-            throw new IllegalArgumentException("Calling decreaseKey() with given argument would not strictly decrease the key");
-        }
-        cars[i] = car;
-        swim(qp[i]);
-    }
-
-    /**
-     * Increase the car associated with index <tt>i</tt> to the specified value.
-     *
-     * @param i the index of the car to increase
-     * @param car increase the car associated with index <tt>i</tt> to this key
-     * @throws IndexOutOfBoundsException unless 0 &le; <tt>i</tt> &lt;
-     * <tt>maxN</tt>
-     * @throws IllegalArgumentException if key &le; key associated with index
-     * <tt>i</tt>
-     * @throws NoSuchElementException no key is associated with index <tt>i</tt>
-     */
-    public void increaseCar(int i, Car car) {
-        if (i < 0 || i >= maxN) {
-            throw new IndexOutOfBoundsException();
-        }
-        if (!contains(i)) {
-            throw new NoSuchElementException("index is not in the priority queue");
-        }
-        if ((cars[i]).getPrice() > (car).getPrice()) {
-            throw new IllegalArgumentException("Calling increaseKey() with given argument would not strictly increase the key");
-        }
-        cars[i] = car;
-        sink(qp[i]);
-    }
-
-    /**
-     * Remove the key associated with index <tt>i</tt>.
-     *
-     * @param i the index of the key to remove
-     * @throws IndexOutOfBoundsException unless 0 &le; <tt>i</tt> &lt;
-     * <tt>maxN</tt>
-     * @throws NoSuchElementException no key is associated with index <t>i</tt>
+     * @throws NoSuchElementException no car is associated with index <t>i</tt>
      */
     public void delete(int i) {
         if (i < 0 || i >= maxN) {
             throw new IndexOutOfBoundsException();
         }
         if (!contains(i)) {
-            throw new NoSuchElementException("index is not in the priority queue");
+            throw new NoSuchElementException("Index " + i + " is not in the priority queue");
         }
         int index = qp[i];
         exch(index, N--);
@@ -321,12 +188,32 @@ public class IndexMinPQ implements Iterable<Integer> {
     }
 
     /**
+     * Removes a minimum car and returns its associated index.
+     *
+     * @return an index associated with a minimum car
+     * @throws NoSuchElementException if this priority queue is empty
+     */
+    public int delMin() {
+        if (N == 0) {
+            throw new NoSuchElementException("Priority queue underflow");
+        }
+        int min = pq[1];
+        exch(1, N--);
+        sink(1);
+        assert min == pq[N + 1];
+        qp[min] = -1;        // delete
+        cars[min] = null;    // to help with garbage collection
+        pq[N + 1] = -1;        // not needed
+        return min;
+    }
+
+    /**
      * *************************************************************************
      * General helper functions.
      * *************************************************************************
      */
     private boolean greater(int i, int j) {
-        if (price) {
+        if (priority.equalsIgnoreCase("price")) { // price
             return (cars[pq[i]]).getPrice() > (cars[pq[j]]).getPrice();
         } else { // mileage
             return (cars[pq[i]]).getMileage() > (cars[pq[j]]).getMileage();
@@ -373,9 +260,8 @@ public class IndexMinPQ implements Iterable<Integer> {
      * *************************************************************************
      */
     /**
-     * Returns an iterator that iterates over the keys on the priority queue in
-     * ascending order. The iterator doesn't implement <tt>remove()</tt> since
-     * it's optional.
+     * Returns an iterator that iterates over the car on the priority queue in
+     * ascending order.
      *
      * @return an iterator that iterates over the keys in ascending order
      */
@@ -389,9 +275,9 @@ public class IndexMinPQ implements Iterable<Integer> {
         private IndexMinPQ copy;
 
         // add all elements to copy of heap
-        // takes linear time since already in heap order so no keys move
+        // takes linear time since already in heap order so no car move
         public HeapIterator() {
-            if (price) {
+            if (priority.equalsIgnoreCase("price")) {
                 copy = new IndexMinPQ(pq.length - 1, "price");
                 for (int i = 1; i <= N; i++) {
                     copy.insert(pq[i], cars[pq[i]]);
