@@ -1,0 +1,5 @@
+For my implementation, I made a CarSystem object that is based on indexable priority queues. For this assignment the CarSystem object
+has 2 priority queues of cars; one with the cars in order by price and the other with them in order by mileage. I decided to make 2 
+separate priority queues and then combine them into one larger object instead of storing the cars in one priority queue with both
+priorities of price and mileage because I could not figure out how to do that. The insert, delMin and delete operations take logarithmic 
+time. The is-empty, size, min-index, min-key, and key-of operations take constant time.
